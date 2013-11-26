@@ -85,7 +85,7 @@ mr = MapReduce.MapReduce()
   1. What other matrix operations are amenable to the Map-Reduce approach?
 """
 # +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-def mapper(record):
+def mapper(key,record):
     # Record Format : [matrix, i, j, value] where matrix is a string 
     # identifying the matrix ('A' or 'B' in this case).
     # i, j are the row and column identifier of matrix cell. 

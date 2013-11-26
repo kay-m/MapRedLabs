@@ -62,7 +62,7 @@ mr = MapReduce.MapReduce()
 # Initialize commonWordList
 commonWords = []
 
-def mapper(record):
+def mapper(key,record):
     # Record Format : A line from the input file.
     global commonWordsList
     
