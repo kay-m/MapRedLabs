@@ -38,6 +38,9 @@ mr = MapReduce.MapReduce()
 #    b. "11_20" if length is between 11 and 20
 #    c. "21_30" if length is between 21 and 30
 #    d. "31+" if length is greater than 31
+#
+#  Dataset : ..\datasets\cstheory_sample\Posts_Sample.csv
+#
 # +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 #  Algorithm Design:
 #
@@ -81,7 +84,7 @@ mr = MapReduce.MapReduce()
 columnNames = {}
 
 # Record Format : A line from the input file.
-def mapper(record):
+def mapper(key,record):
         
     global columnNames
     

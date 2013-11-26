@@ -17,18 +17,22 @@ mr = MapReduce.MapReduce()
 #      arg-1 : File containing list of images to be processed. Each line of the 
 #              file should contain one image file name (including path)
 #
+#  Dataset: imagelist.txt (in the same folder as this file)
+#  
 # +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 #  
 #  Algorithm Design:
 #  
-#  Key Idea: Use the pixel array representation of the full image as a key. Send all
-#            images with the same pixel array representation to the same reducer.
+#  Key Idea: Use the pixel array representation of the full image as a key. 
+#            Send all images with the same pixel array representation to the 
+#            same reducer.
 #
 #  Mapper:
-#  1. Input:  One line from the file. This will be a list containing the
-#             values of each column of a record.
-#  2. Key   : AnswerCount
-#     value : (Title, Score, ViewCount, CommentsCount)
+#  1. Input:  List containing two elements. The first is the name of the image
+#             file. The second element is a list in itself containing the pixel
+#             values of all the channels in the image. 
+#  2. Key   : String representation of image data
+#     value : file name
 #     Do not emit anything if the AnswerCount field is NULL. 
 #  Reducer:
 #     Emit an output only if the key is zero.     
@@ -44,7 +48,7 @@ mr = MapReduce.MapReduce()
 """
 # +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
-def mapper(record):
+def mapper(key,record):
   # record : List with two elements. File name and image data as a list. 
   fileName = record[0]  
   imageData = record[1]

@@ -18,7 +18,7 @@ mr = MapReduce.MapReduce()
 #              The first row of the file should contain the column names. 
 #              The first column of each row should identify the table name. 
 #  The application is hard-coded to implement a SQL statement that answers
-#  the following question on the 'Posts" data of stack overflow:
+#  the following question on the "Posts" data of stack overflow:
 #
 #  Are there any questions(posts) that do not have an answer as yet? If yes, 
 #  list the Title, Score, ViewCount and CommentsCount of the post. 
@@ -27,7 +27,8 @@ mr = MapReduce.MapReduce()
 #  SELECT Title, Score, ViewCount, CommentsCount
 #  FROM Posts
 #  WHERE AnswerCount = 0
-#
+#  
+#  Dataset : ..\datasets\cstheory_sample\Posts_Sample.csv
 # +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 #  
 #  Algorithm Design:
@@ -75,7 +76,7 @@ mr = MapReduce.MapReduce()
 columnNames = {}
 
 # Record Format : A line from the input file.
-def mapper(record):
+def mapper(key,record):
         
     global columnNames
     

@@ -4,6 +4,7 @@
 #                          a. Comma Separated Values
 #                          b. XML files containing the StackExchange dump.
 #                          c. Plain text files. 
+#                          d. Image files.
 import json
 import csv
 from PIL import Image
@@ -31,7 +32,7 @@ class MapReduce:
             if (fileFormat == "JSON"):
                 for line in data:
                     record = json.loads(line)
-                    mapper(record)
+                    mapper(fileName,record)
             
             if (fileFormat == "CSV-SkipFirstLine"):
                 csvReader = csv.reader(data,delimiter=',')
@@ -39,7 +40,7 @@ class MapReduce:
                 firstLine = 0
                 for line in csvReader:
                     if firstLine <> 0:
-                        mapper(line)
+                        mapper(fileName,line)
                     else:
                         firstLine = 1
                     
@@ -47,11 +48,11 @@ class MapReduce:
                 csvReader = csv.reader(data,delimiter=',')
                 
                 for line in csvReader:
-                    mapper(line)
+                    mapper(fileName,line)
                     
             if (fileFormat == "TEXT"):
                 for line in data:
-                    mapper(line)
+                    mapper(fileName,line)
             
             if (fileFormat == "IMAGE"):
                 imageFile = Image.open(fileName)
@@ -59,7 +60,7 @@ class MapReduce:
                 mapperInput = []
                 mapperInput.append(fileName)
                 mapperInput.append(imageData)
-                mapper(mapperInput)
+                mapper(fileName,mapperInput)
                     
             # SOXML is used to identify XML file dumps of StackExchange datasets.
             # In all StackExchange XML files, the main data is stored as attributes
@@ -71,7 +72,7 @@ class MapReduce:
                 treeRoot = xmlTree.getRoot()
                 for child in root:
                     if (child.tag == "row"):
-                        mapper(child.attrib)
+                        mapper(fileName,child.attrib)
         
         for key in self.intermediate:
             reducer(key, self.intermediate[key])

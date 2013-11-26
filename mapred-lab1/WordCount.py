@@ -16,7 +16,9 @@ mr = MapReduce.MapReduce()
 #
 #   arg-1 : File on which word count is to be performed.
 #   arg-2 : File containing list of common words.
-#
+# 
+# DataSet: datasets\SwamiDiscourse\DD_Nov_21_2000
+# 
 # +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 #
 # Algorithm:
@@ -24,8 +26,8 @@ mr = MapReduce.MapReduce()
 #   Key Idea: Send all occurences of the same word to the same reducer.
 #
 #   Initial Setup:
-#     Store the list of words to be eliminated from the count in a global
-#     list named commonWordsList. 
+#     Store the list of words that should not be counted (common words)
+#     in a global list named commonWordsList. 
 #
 #   Mapper:
 #     Each invocation of the mapper will be provided one line from the  
@@ -34,10 +36,12 @@ mr = MapReduce.MapReduce()
 #     only if it is not in the common words list. Once the list is
 #     created, each item of the list will be emitted as a key with a
 #     value of 1.
+#     Key    : Word in line
+#     Value  : 1
 #
 #  Reducer:
 #     The number of elements in the list of values will be equal to the number
-#     of occurences of the word. Emit the key and the length of the list
+#     of occurences of the word. Emit the key and the length of the list.
 # +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 """
    Questions:
@@ -45,13 +49,13 @@ mr = MapReduce.MapReduce()
    2. How will you handle case sensitivity of the terms?
    3. How would you split the line into words without the punctuation characters?
    4. How would you modify the application to work on a set of input files 
-      instead of a single file. 
-   5. Is it possible to sort the final output by the number of occurences in 
+      instead of a single file? 
+   5. How would you sort the final output by the number of occurences in 
       descending order? (The most frequent word is at the top).
    Extensions:
-   1. Use standard stemming techniques to convert to convert a word to it's 
-      root form. This will improve the usefulness of the search engine you can 
-      build on top of this.
+   1. Use standard stemming techniques to convert a word to it's root form.
+      This will improve the usefulness of the search engine you can build on 
+      top of this.
    
 """
 # +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
@@ -89,10 +93,12 @@ def reducer(key, list_of_values):
     mr.emit((key,numOccurences))
     
 # +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-if __name__ == '__main__':
+def main():
 
-  # Build the list of common words by opening
+  # Build the list of common words passed in via sys.argv[2]
   commonWordsFile = open(sys.argv[2])
+  
+  # Split each line in commonWordsFile and add each word into commonWords
   for line in commonWordsFile:
     words = line.split()
     for word in words:
@@ -104,3 +110,7 @@ if __name__ == '__main__':
   # 3. Name of the reduce routine
   # 4. Type of file. Values can be TEXT, JSON, SOXML, CSV.
   mr.execute(sys.argv[1], mapper, reducer,"TEXT")
+
+# +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+if __name__ == '__main__':
+  main()

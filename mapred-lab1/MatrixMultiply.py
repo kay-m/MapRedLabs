@@ -37,6 +37,39 @@ mr = MapReduce.MapReduce()
 #   Each column of B should be sent to every row of the result. 
 #   => Element B[i,j] should be sent to every element in Result[k,j] 
 #      where k = 0..M-1. M is the number of rows of A.
+#  
+#    
+#             MAT A (3x4)                MAT B (4x2)
+#         0     1     2     3             0     1   
+#      -------------------------       -------------
+#  0   | a1  |  a2 |  a3 |  a4 |       |  b1 |  b2 |
+#      -------------------------       -------------
+#  1   | a5  |  a6 |  a7 |  a8 |       |  b3 |  b4 |
+#      -------------------------       -------------
+#  2   | a9  | a10 | a11 | a12 |       |  b5 |  b6 |
+#      -------------------------       -------------
+#                                      |  b7 |  b8 |
+#                                      -------------
+#
+#                             A x B (3 x 2)
+#    (Mapping of elements from A)         (Mapping of elements from B)
+#                0     1                           0     1 
+#             -------------                     -------------
+#          0  |  a1 |  a1 |                  0  | b1  |  b2 |  
+#             |  a2 |  a2 |                     | b3  |  b4 |
+#             |  a3 |  a3 |                     | b5  |  b6 |
+#             |  a4 |  a4 |                     | b7  |  b8 |
+#             -------------                     -------------
+#          1  |  a5 |  a5 |                  1  | b1  |  b2 |
+#             |  a6 |  a6 |                     | b3  |  b4 |
+#             |  a7 |  a7 |                     | b5  |  b6 |
+#             |  a8 |  a8 |                     | b7  |  b8 |
+#             -------------                     -------------
+#          2  |  a9 |  a9 |                  2  | b1  |  b2 |
+#             | a10 | a10 |                     | b3  |  b4 |
+#             | a11 | a11 |                     | b5  |  b6 |
+#             | a12 | a12 |                     | b7  |  b8 |
+#             -------------                     -------------
 #
 # Reducer:
 #   Each reducer computes sum(A[i,j]*B[j,k]).
@@ -45,9 +78,11 @@ mr = MapReduce.MapReduce()
   Questions:
   1. How would you handle sparse matrices? For a sparse matrix, you will not 
      have an entry in the input file for matrix elements that do not exist.
-  
+  2. The dimensions of the matrix are hardcoded into the application. How 
+     will you provide this as input to the application?
+     
   Extensions:
-  
+  1. What other matrix operations are amenable to the Map-Reduce approach?
 """
 # +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 def mapper(record):
@@ -59,8 +94,8 @@ def mapper(record):
     #    For matrix A, set of all (i,k) where k in 0..NUM_COLS_IN_B-1
     #    For matrix B, set of all (k,j) where j  in 0..NUM_ROWS_IN_A-1
     # Value: Full record as received.
-    NUM_COLS_IN_B = 3
     NUM_ROWS_IN_A = 9
+    NUM_COLS_IN_B = 3
     matrixName = record[0]
     if (matrixName == 'A'):
         i = record[1]

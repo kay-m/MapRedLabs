@@ -30,7 +30,9 @@ mr = MapReduce.MapReduce()
 #  FROM Users,Posts
 #  WHERE Users.Id = Posts.OwnerUserId AND
 #        Users.Reputation > 500
-#
+# 
+#  Datasets: ..\datasets\cstheory_sample\Posts_Sample.csv
+#            ..\datasets\cstheory_sample\Users_Sample.csv  
 # +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 #  
 #  Algorithm Design:
@@ -85,7 +87,7 @@ usersTblColumns = {}
 postsTblColumns = {}
 
 # Record Format : A line from the input file.
-def mapper(record):
+def mapper(key,record):
         
     global usersTblColumns
     global postsTblColumns
