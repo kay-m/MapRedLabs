@@ -49,23 +49,24 @@ mr = MapReduce.MapReduce()
 # +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
 def mapper(key,record):
-  # record : List with two elements. File name and image data as a list. 
-  fileName = record[0]  
-  imageData = record[1]
+  # record : List with two elements. 
+  #   0. File name 
+  #   1. Image data as a list. 
+  
+  # Extract fileName and imageData from the record.
+  
   
   # key -> string representation of imageData, value -> fileName
   
-  mr.emit_intermediate(str(imageData),fileName)
 
 def reducer(key, list_of_values):
-    str = ""
-    for name in list_of_values:
-        str += name + ","
-    mr.emit(str)
+  
+  # Extract each element from list_of_values (it is a python list) and append
+  # it to a string and emit the string.
+  
 
 # +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-if __name__ == '__main__':
-
+def main():
   # Build list of image files to be processed
   fileNameList = []
   inputFiles = open(sys.argv[1])
@@ -73,3 +74,7 @@ if __name__ == '__main__':
     fileNameList.append(line.strip())
     
   mr.execute(fileNameList, mapper, reducer,"IMAGE")
+# +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++  
+if __name__ == '__main__':
+    main()
+  

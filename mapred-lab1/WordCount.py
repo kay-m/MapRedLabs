@@ -67,20 +67,18 @@ def mapper(key,record):
     global commonWordsList
     
     # Split the words in the line using the split() method on a string.
-    allWordsInLine = record.split()
+    # Store the words in the allWordsInLine list.
+    
     
     # Initialize the wordsInLine list
     wordsInLine = []
     
     # Iterate over the allWordsInLine list and add the word to the wordsInLine
     # list only if it is not a common word. (not in commonWords)
-    for word in allWordsInLine:
-        if word not in commonWords:
-            wordsInLine.append(word)
+    
     
     # For each word in wordsInLine emit key -> word, value -> 1
-    for word in wordsInLine:
-        mr.emit_intermediate(word,1)
+    
        
 
 def reducer(key, list_of_values):
@@ -89,8 +87,7 @@ def reducer(key, list_of_values):
     # of occurences of the key is hence the length of the list
     # Emit key and the length of the list of values.
      
-    numOccurences = len(list_of_values)
-    mr.emit((key,numOccurences))
+    
     
 # +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 def main():

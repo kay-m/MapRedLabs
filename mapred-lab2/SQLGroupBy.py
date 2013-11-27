@@ -96,27 +96,18 @@ def mapper(key,record):
     titleRange = "UNKNOWN"
     
     lenTitle = len(title)
-    if (lenTitle > 0 and lenTitle <= 10):
-        titleRange = "1_10"
-    elif (lenTitle > 10 and lenTitle <= 20):
-        titleRange = "11_20"
-    elif (lenTitle > 20 and lenTitle <= 30):
-        titleRange = "21_30"
-    else:
-        titleRange = "30+"
+    
     
     # Emit: Key -> lenTitle, value -> 1
-    mr.emit_intermediate(titleRange,1)
+    
 
 def reducer(key, list_of_values):
      
     # Emit: key,length of list_of_values
-    emitStr = key + "->" + str(len(list_of_values))
-    mr.emit(emitStr)
+    
 
 # +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-if __name__ == '__main__':
-
+def main():
   # Extract the first line from the file to get the column names.
   tableData = open(sys.argv[1])
   firstLine = tableData.readline()
@@ -134,3 +125,7 @@ if __name__ == '__main__':
   fileNameList = []
   fileNameList.append(sys.argv[1])
   mr.execute(fileNameList, mapper, reducer,"CSV-SkipFirstLine")
+
+# +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+if __name__ == '__main__':
+    main()

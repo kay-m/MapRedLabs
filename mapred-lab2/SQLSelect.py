@@ -83,32 +83,27 @@ def mapper(key,record):
     # Get the column index for column AnswerCount from the columnNames dict.
     answerCountIdx = columnNames['AnswerCount']
     
-    # Extract the value of AnswerCount from the record.
-    key = record[answerCountIdx]
+    # Extract the value of AnswerCount from the record. This will be the key 
+    # emitted by the mapper. It is possible that the key is null if there 
+    # is no value for the AnswerCount field.
+    answerCount = record[answerCountIdx]
     
     # Get the column index for Title, Score, ViewCount and CommentsCount
-    titleIdx = columnNames['Title']
-    scoreIdx = columnNames['Score']
-    viewCountIdx = columnNames['ViewCount']
-    commentsCountIdx = columnNames['CommentsCount']
+    
     
     # Setup the value as a tuple "val = (a,b,c) "
-    value = (record[titleIdx],record[scoreIdx],record[viewCountIdx],record[commentsCountIdx])
+    value = ('''Fill in the values here''')
     
-    # Emit only if key is not NULL
-    if key <> "":
-        mr.emit_intermediate(key,value)
+    # Emit only if answerCount is not NULL
+    
 
 def reducer(key, list_of_values):
      
     # Emit output only if key is zero. The key will be a string
-    if (key == '0'):
-        for val in list_of_values:
-            mr.emit((key,val))
+    
 
 # +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-if __name__ == '__main__':
-
+def main():
   # Extract the first line from the file to get the column names.
   tableData = open(sys.argv[1])
   firstLine = tableData.readline()
@@ -116,13 +111,22 @@ if __name__ == '__main__':
   
   # remove the newline at the end of the line
   firstLine = firstLine.replace('\n','')
-  columnNamesList = firstLine.split(",")
-  count = 0
-  for columnName in columnNamesList:
-    columnNames[columnName] = count
-    count += 1
   
+  # Extract the list of column names
+  columnNamesList = firstLine.split(",")
+  
+  # Assign the column index to each column.
+  colIndex = 0
+  for columnName in columnNamesList:
+    columnNames[columnName] = colIndex
+    colIndex += 1
+  
+  # Call map reduce.
   inputdata = open(sys.argv[1])
   fileNameList = []
   fileNameList.append(sys.argv[1])
   mr.execute(fileNameList, mapper, reducer,"CSV-SkipFirstLine")
+
+# ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++  
+if __name__ == '__main__':
+    main()

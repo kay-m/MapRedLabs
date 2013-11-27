@@ -86,29 +86,28 @@ mr = MapReduce.MapReduce()
 """
 # +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 def mapper(key,record):
-    # Record Format : [matrix, i, j, value] where matrix is a string 
-    # identifying the matrix ('A' or 'B' in this case).
-    # i, j are the row and column identifier of matrix cell. 
-    # value is the value of cell [i][j]
+    # Record Format : Record is a list of four elements in the foll format:
+    #    [matrix, i, j, value] where,
+    #          matrix is a string identifying the matrix ('A' or 'B' ).
+    #          i, j are the row and column identifier of matrix cell. 
+    #          value is the value of cell [i][j]
     # keys: 
     #    For matrix A, set of all (i,k) where k in 0..NUM_COLS_IN_B-1
     #    For matrix B, set of all (k,j) where j  in 0..NUM_ROWS_IN_A-1
     # Value: Full record as received.
+    
+    # The size of the o/p matrix is determined by the number of rows in A
+    # and number of columns in B. Set these values. 
     NUM_ROWS_IN_A = 9
     NUM_COLS_IN_B = 3
+    
+    #Extract the name of the matrix
     matrixName = record[0]
-    if (matrixName == 'A'):
-        i = record[1]
-        for j in range(0,NUM_COLS_IN_B):
-            key = (i,str(j))
-            mr.emit_intermediate(key,record)
-    else:
-        # Matrix B
-        j = record[2]
-        for i in range(0,NUM_ROWS_IN_A):
-            key = (str(i),j)
-            mr.emit_intermediate(key,record)        
-        
+    
+    # The key is an array index (i,j). For matrix A, extract i from the
+    # record. The values for j will be in the range 0..NUM_COLS_IN_B. You can 
+    # use the range function for this. For matrix B, j will be picked from the
+    # record and values of i will be in the range 0..NUM_ROWS_IN_A
 
 
 def reducer(key, list_of_values):
@@ -116,7 +115,9 @@ def reducer(key, list_of_values):
     # value: An element of matrix A or B in the following format:
     #        [matrix, i, j, value]
     
+    # Initialize the value for the cell.
     total = 0
+    
     # Extract records of 'A'
     matA = []
     for cell in list_of_values:
@@ -124,20 +125,13 @@ def reducer(key, list_of_values):
             matA.append(cell)
             
     # Extract records of 'B'
-    matB = []
-    for cell in list_of_values:
-        if (cell[0] == "B"):
-            matB.append(cell)
+    
             
     # For each element from A, find all elements from B such that
     # the column number of A matches with the row number of B. (A[i,j]*B[j,k])
     # For each such pair, multiply the values of the cell and add 
-    # it to a running total.
-    for cellA in matA:
-        for cellB in matB:
-            if (cellA[2] == cellB[1]):
-                total = total + int(cellA[3])*int(cellB[3])
-    mr.emit((key[0],key[1], total))
+    # it to a total.
+    
 
 # +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 if __name__ == '__main__':

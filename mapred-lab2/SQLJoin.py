@@ -66,7 +66,7 @@ mr = MapReduce.MapReduce()
 #     User record and the Title, AnswerCount and CommentCount from each
 #     list item that belongs to the posts table. Emit one line for each item
 #     belonging to the posts table. 
-#     Do not emit anything is the userReputation is less than 500
+#     Do not emit anything if the userReputation is less than 500
 #       
 # +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
@@ -99,21 +99,17 @@ def mapper(key,record):
     usersTblJoinCol = usersTblColumns['Id']
     
     # Determine if the row is from the Users table or from the Posts table.
-    # Use the first column to identify the table
+    # Use the first column to identify the table. For the Posts table, the
+    # key should be the value of postsTblJoinCol. What should be the key for
+    # the users table? 
+    # Also determine is record corresponds to a question. 
+    # The PostTypeId column for record from the Posts table will be "1" if 
+    # it is a question. Set isQuestion to "1" for all records from users table.
     key = ""
     isQuestion = 0
-    if (record[0] == "POSTS"):
-        key = record[postsTblJoinCol]
-        if (record[postsTblColumns["PostTypeId"]] == "1"):
-            isQuestion = 1
-        
-    elif (record[0] == "USERS"):
-        key = record[usersTblJoinCol]
-        #set isQuestion to "1" for all records from users table.
-        isQuestion = 1
-        
-    if (key <> "" and isQuestion == 1):
-        mr.emit_intermediate(key,record)
+    
+    # Emit if key is not NULL and its is a question    
+    
     
 def reducer(key, list_of_values):
     
@@ -126,39 +122,11 @@ def reducer(key, list_of_values):
     usersTblRecPresent = 0;
     postsTblRecPresent = 0;
     
-    if len(list_of_values) > 1 :
-        for item in list_of_values:
-            if (item[0] == "USERS"):
-                userName = item[usersTblColumns['DisplayName']]
-                userReputation = item[usersTblColumns['Reputation']]
-                usersTblRecPresent = 1
-            elif(item[0] == "POSTS"):
-                postsTblRecPresent = 1
-                
-        # Return if we do not find matching recods from both tables 
-        if (usersTblRecPresent + postsTblRecPresent <> 2) :
-            return
-        # Return if user reputation is less than 500
-        if (int(userReputation) < 500):
-            return
-            
-        # Emit an output record only for users with reputation         
-        # Iterate over all the values and return one record for each 
-        # record from posts table
-        outStr = ""
-        for item in list_of_values:
-            if (item[0] == "POSTS"):
-                outStr = key + ',' + userName + ',' + userReputation + ","
-                outStr += item[postsTblColumns['Title']] + ','
-                outStr += item[postsTblColumns['AnswerCount']] + ','
-                outStr += item[postsTblColumns['CommentCount']]
-                mr.emit(outStr)
-                outStr = ""
+    
             
 
 # +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-if __name__ == '__main__':
-
+def main():
   # Extract the first line from the file to get the column names.
   usersTblData = open(sys.argv[1])
   firstLine = usersTblData.readline()
@@ -191,4 +159,9 @@ if __name__ == '__main__':
   fileNameList.append(sys.argv[1])
   fileNameList.append(sys.argv[2])
   mr.execute(fileNameList, mapper, reducer,"CSV-SkipFirstLine")
+# +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+if __name__ == '__main__':
+    main()
+
   
